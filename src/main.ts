@@ -2,6 +2,8 @@ import untypedData from "./data.json";
 
 const width = 500;
 const height = 500;
+const saveImage = false;
+
 const data = untypedData as (number | null)[][][];
 let source = 0;
 let column = 0;
@@ -34,6 +36,13 @@ const update = () => {
   ctx.beginPath();
   points.forEach((p, i) => (i === 0 ? ctx.moveTo(...p) : ctx.lineTo(...p)));
   ctx.stroke();
+
+  if (saveImage) {
+    const a = document.createElement("a");
+    a.download = `0-${source}-${column}.png`;
+    a.href = canvas.toDataURL();
+    a.click();
+  }
 };
 
 const sourceInput = document.createElement("input");
