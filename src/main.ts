@@ -1,23 +1,15 @@
 import untypedData from "./data.json";
 
-const width = 500;
-const height = 500;
+type Point = { x: number; y: number };
+type Path = { from: Point; to: Point };
+
+const size = 500;
 const blur = 4;
-const skinny = 0.1;
+const lineWidth = 6;
+const sampleSize = 100;
 let source: number;
 let cx: number;
 let cy: number;
-
-const data = untypedData as number[][][];
-
-const canvas = document.createElement("canvas");
-canvas.width = width;
-canvas.height = height;
-const ctx = canvas.getContext("2d")!;
-ctx.lineWidth = 2 * blur;
-ctx.filter = `blur(${blur}px) brightness(0.6) contrast(5)`;
-document.body.style.background = "#eee";
-document.body.append(canvas);
 
 const normalize = (values: number[]) => {
   const min = Math.min(...values);
@@ -25,78 +17,65 @@ const normalize = (values: number[]) => {
   return values.map((v) => (v - min) / (max - min));
 };
 
-const interpolate = (cursor: number, values: number[]) => {
-  const t = cursor * values.length - 1;
-  const s = t % 1;
-  const iFrom = Math.floor(t);
-  const iTo = iFrom + 1;
-  return (1 - s) * values[iFrom] + s * values[iTo];
-};
+const coord = (v: number) => size * (0.1 + 0.8 * v);
+
+const randomPick = <T>(arr: T[]) => arr[~~(Math.random() * arr.length)];
+
+const data = untypedData as number[][][];
+const canvas = document.createElement("canvas");
+canvas.width = size;
+canvas.height = size;
+const ctx = canvas.getContext("2d")!;
+ctx.lineCap = "round";
+ctx.lineWidth = lineWidth;
+ctx.filter = `blur(${blur}px) contrast(2)`;
+document.body.style.background = "#eee";
+document.body.append(canvas);
 
 const update = () => {
   source = Math.floor(Math.random() * data.length);
   cx = Math.floor(Math.random() * data[source].length);
   cy = Math.floor(Math.random() * data[source].length);
 
+  const { length } = data[source][0];
   const xs = normalize(data[source][cx]);
   const ys = normalize(data[source][cy]);
-
-  const { length } = data[source][0];
   const ps = Array(length)
     .fill(null)
-    .map((_, i) => {
-      const cursor = i / length;
-      const xMeasured = xs[i];
-      const yMeasured = ys[i];
-      const xProjMin = interpolate(cursor, [
-        0,
-        skinny,
-        1,
-        skinny,
-        0,
-        skinny,
-        1,
-      ]);
-      const xProjMax = interpolate(cursor, [
-        0,
-        1 - skinny,
-        1,
-        1 - skinny,
-        0,
-        1 - skinny,
-        1,
-      ]);
-      const yProjMin = interpolate(cursor, [
-        0,
-        skinny,
-        0,
-        skinny,
-        1,
-        skinny,
-        1,
-      ]);
-      const yProjMax = interpolate(cursor, [
-        0,
-        1 - skinny,
-        0,
-        1 - skinny,
-        1,
-        1 - skinny,
-        1,
-      ]);
-      const xPoint = xProjMin + (xProjMax - xProjMin) * xMeasured;
-      const yPoint = yProjMin + (yProjMax - yProjMin) * yMeasured;
-      const xCanvas = 5 * blur + (width - 10 * blur) * xPoint;
-      const yCanvas = 5 * blur + (height - 10 * blur) * yPoint;
-      return [xCanvas, yCanvas] as const;
-    });
+    .map((_, i) => ({ x: xs[i], y: ys[i] }));
+
+  const paths = [] as Path[];
+  const addPath = (from: Point) => {
+    const tos = Array(Math.min(sampleSize, ps.length))
+      .fill(null)
+      .map(() => randomPick(ps))
+      .map((to) => ({ to, d2: (to.x - from.x) ** 2 + (to.y - from.y) ** 2 }))
+      .sort((a, b) => a.d2 - b.d2)
+      .slice(0, 3)
+      .map(({ to }) => to);
+    for (const to of tos) paths.push({ from, to });
+  };
+  for (const p of ps) addPath(p);
+  addPath({ x: 0, y: 0 });
+  addPath({ x: 0, y: 1 });
+  addPath({ x: 1, y: 0 });
+  addPath({ x: 1, y: 1 });
 
   ctx.fillStyle = "white";
-  ctx.fillRect(0, 0, width, height);
+  ctx.fillRect(0, 0, size, size);
   ctx.strokeStyle = "black";
-  ctx.beginPath();
-  ps.forEach((p, i) => (i === 0 ? ctx.moveTo(...p) : ctx.lineTo(...p)));
-  ctx.stroke();
+  for (const { from, to } of paths) {
+    ctx.beginPath();
+    ctx.moveTo(coord(from.x), coord(from.y));
+    ctx.lineTo(coord(to.x), coord(to.y));
+    ctx.stroke();
+  }
+
+  ctx.fillStyle = "red";
+  ctx.fillRect(coord(0) - 1, coord(0) - 1, 5, 5);
+  ctx.fillRect(coord(0) - 1, coord(1) - 1, 5, 5);
+  ctx.fillRect(coord(1) - 1, coord(0) - 1, 5, 5);
+  ctx.fillRect(coord(1) - 1, coord(1) - 1, 5, 5);
 
   ctx.drawImage(canvas, 0, 0);
 };
@@ -104,7 +83,7 @@ const update = () => {
 const save = () => {
   const a = document.createElement("a");
   a.href = canvas.toDataURL();
-  a.download = `blur.${blur}-${source}-${cx}-${cy}.png`;
+  a.download = `closest.${blur}-${source}-${cx}-${cy}.png`;
   a.click();
 };
 
