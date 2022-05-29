@@ -2,45 +2,37 @@ import untypedData from "./data.json";
 
 const width = 500;
 const height = 500;
-const savePrefix = "xy";
+const savePrefix = false;
 
 const data = untypedData as (number | null)[][][];
-let source = 0;
-let cx = 0;
-let cy = 0;
 
 const canvas = document.createElement("canvas");
 canvas.width = width;
 canvas.height = height;
 canvas.style.border = "1px solid black";
 const ctx = canvas.getContext("2d")!;
+document.body.append(canvas);
 
 const isNumberArray = (values: (number | null)[]): values is number[] =>
   !values.some((value) => value === null);
 
-const update = () => {
-  const m = data[source];
-  const xs = m.map((row) => row[cx]);
-  if (!isNumberArray(xs)) return console.log("null detected");
-  const xmin = Math.min(...xs);
-  const xmax = Math.max(...xs);
-  if (xmin === xmax) return console.log("all same");
+const getNormalizedValues = (source: number, col: number) => {
+  const rawValues = data[source].map((row) => row[col]);
+  if (!isNumberArray(rawValues)) throw new Error("nulls");
+  const min = Math.min(...rawValues);
+  const max = Math.max(...rawValues);
+  if (min === max) throw new Error("same");
+  return rawValues.map((v) => (v - min) / (max - min));
+};
 
-  const ys = m.map((row) => row[cy]);
-  if (!isNumberArray(ys)) return console.log("null detected");
-  const ymin = Math.min(...ys);
-  const ymax = Math.max(...ys);
-  if (ymin === ymax) return console.log("all same");
+const update = (source: number, cx: number, cy: number) => {
+  const m = data[source];
+  const xs = getNormalizedValues(source, cx);
+  const ys = getNormalizedValues(source, cy);
 
   const ps = Array(m.length)
     .fill(null)
-    .map(
-      (_, i) =>
-        [
-          width * ((xs[i] - xmin) / (xmax - xmin)),
-          height * ((ys[i] - ymin) / (ymax - ymin)),
-        ] as const
-    );
+    .map((_, i) => [width * xs[i], height * ys[i]] as const);
 
   ctx.fillStyle = "white";
   ctx.fillRect(0, 0, width, height);
@@ -57,41 +49,18 @@ const update = () => {
   }
 };
 
-const sourceInput = document.createElement("input");
-sourceInput.type = "number";
-sourceInput.min = "0";
-sourceInput.step = "1";
-sourceInput.max = `${data.length - 1}`;
-sourceInput.value = `${source}`;
-sourceInput.addEventListener("input", () => {
-  source = +sourceInput.value;
-  update();
+const find = () => {
+  const source = Math.floor(Math.random() * data.length);
+  const cx = Math.floor(Math.random() * data.length);
+  const cy = Math.floor(Math.random() * data.length);
+  try {
+    update(source, cx, cy);
+  } catch (e) {
+    requestAnimationFrame(find);
+  }
+};
+
+document.addEventListener("keypress", (e) => {
+  if (e.key !== "f") return;
+  find();
 });
-
-const cxInput = document.createElement("input");
-cxInput.type = "number";
-cxInput.min = "0";
-cxInput.step = "1";
-cxInput.max = `${data[0].length - 1}`;
-cxInput.value = `${cx}`;
-cxInput.addEventListener("input", () => {
-  cx = +cxInput.value;
-  update();
-});
-
-const cyInput = document.createElement("input");
-cyInput.type = "number";
-cyInput.min = "0";
-cyInput.step = "1";
-cyInput.max = `${data[0].length - 1}`;
-cyInput.value = `${cy}`;
-cyInput.addEventListener("input", () => {
-  cy = +cyInput.value;
-  update();
-});
-
-const header = document.createElement("div");
-header.append(sourceInput, cxInput, cyInput);
-document.body.append(header, canvas);
-
-update();
