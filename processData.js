@@ -12,7 +12,16 @@ const { readdir, readFile, writeFile } = require("node:fs/promises");
             .split("\n")
             .slice(0, -1)
             .map((line) => line.split(",").map((value) => +value));
-          return matrix;
+          const measurement = [];
+          for (const column in matrix[0]) {
+            const values = matrix.map((row) => row[column]);
+            if (values.some((value) => Number.isNaN(value))) continue;
+            const min = Math.min(...values);
+            const max = Math.max(...values);
+            if (min === max) continue;
+            measurement.push(values);
+          }
+          return measurement;
         })()
       )
   );
