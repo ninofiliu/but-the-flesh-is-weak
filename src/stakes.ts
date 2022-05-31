@@ -1,5 +1,5 @@
 import untypedData from "./data.json";
-import { randomPick } from "./lib";
+import { normalize, randomPick } from "./lib";
 
 type Point = { x: number; y: number };
 type Path = { from: Point; to: Point };
@@ -11,12 +11,6 @@ const sampleSize = 100;
 let source: number;
 let cx: number;
 let cy: number;
-
-const normalize = (values: number[]) => {
-  const min = Math.min(...values);
-  const max = Math.max(...values);
-  return values.map((v) => (v - min) / (max - min));
-};
 
 const coord = (v: number) => size * (0.1 + 0.8 * v);
 
