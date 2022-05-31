@@ -1,15 +1,15 @@
 import {
   AmbientLight,
-  AxesHelper,
-  BoxGeometry,
+  DirectionalLight,
   Mesh,
   MeshStandardMaterial,
   PerspectiveCamera,
-  PointLight,
   Scene,
+  Vector3,
   WebGLRenderer,
 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { ConvexGeometry } from "three/examples/jsm/geometries/ConvexGeometry";
 
 const renderer = new WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -24,26 +24,68 @@ const camera = new PerspectiveCamera(
   0.1,
   1000
 );
-const controls = new OrbitControls(camera, renderer.domElement);
-const axesHelper = new AxesHelper(1);
-scene.add(axesHelper);
 
 camera.position.set(1, 1, 1);
-controls.update();
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
 
-const cube = new Mesh(
-  new BoxGeometry(1, 1, 1),
-  new MeshStandardMaterial({
-    roughness: 0.5,
-    metalness: 0.5,
-  })
+const green = new DirectionalLight(0x008800, 0.5);
+green.position.set(-1, 0, 0);
+const white = new DirectionalLight(0x888888, 0.5);
+white.position.set(0, 1, 0);
+const blue = new DirectionalLight(0x000088, 0.5);
+blue.position.set(1, 0, 0);
+const ambient = new AmbientLight(0x888888, 0.2);
+scene.add(green, white, blue, ambient);
+
+const nbCenters = 20;
+const nbPoints = 40;
+const nbLinkPoints = 5;
+const nbSamples = 15;
+const nbPaths = 3;
+const nodeRadius = 0.15;
+
+const nRandomPointsAround = (n: number, center: Vector3, dist: number) =>
+  Array(n)
+    .fill(null)
+    .map(
+      () =>
+        new Vector3(
+          center.x + dist * (-0.5 + Math.random()),
+          center.y + dist * (-0.5 + Math.random()),
+          center.z + dist * (-0.5 + Math.random())
+        )
+    );
+
+const material = new MeshStandardMaterial();
+const centers = nRandomPointsAround(nbCenters, new Vector3(0, 0, 0), 1);
+const points = centers.map((center) =>
+  nRandomPointsAround(nbPoints, center, nodeRadius)
 );
-scene.add(cube);
+for (let ci = 0; ci < centers.length; ci++) {
+  scene.add(new Mesh(new ConvexGeometry(points[ci]), material));
 
-const pointLight = new PointLight(0xffffff, 1);
-pointLight.position.set(0, 2, 0);
-const ambientLight = new AmbientLight(0xffffff, 0.1);
-scene.add(pointLight, ambientLight);
+  Array(nbSamples)
+    .fill(null)
+    .map(() => ~~(Math.random() * centers.length))
+    .map((i) => ({
+      i,
+      d2:
+        (centers[i].x - centers[ci].x) ** 2 +
+        (centers[i].y - centers[ci].y) ** 2 +
+        (centers[i].z - centers[ci].z) ** 2,
+    }))
+    .sort((a, b) => a.d2 - b.d2)
+    .slice(0, nbPaths)
+    .forEach(({ i }) => {
+      if (ci === i) return;
+      const link = new ConvexGeometry([
+        ...points[ci].slice(0, nbLinkPoints),
+        ...points[i].slice(0, nbLinkPoints),
+      ]);
+      scene.add(new Mesh(link, material));
+    });
+}
 
 const animate = () => {
   controls.update();

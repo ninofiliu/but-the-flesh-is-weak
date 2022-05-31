@@ -1,4 +1,5 @@
 import untypedData from "./data.json";
+import { randomPick } from "./lib";
 
 type Point = { x: number; y: number };
 type Path = { from: Point; to: Point };
@@ -18,8 +19,6 @@ const normalize = (values: number[]) => {
 };
 
 const coord = (v: number) => size * (0.1 + 0.8 * v);
-
-const randomPick = <T>(arr: T[]) => arr[~~(Math.random() * arr.length)];
 
 const data = untypedData as number[][][];
 const canvas = document.createElement("canvas");
