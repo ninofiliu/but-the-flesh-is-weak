@@ -1,16 +1,26 @@
 lockfileVersion: 5.4
 
 specifiers:
+  '@types/three': ^0.140.0
   prettier: ^2.6.2
+  three: ^0.141.0
   typescript: ^4.5.4
   vite: ^2.9.9
 
+dependencies:
+  three: 0.141.0
+
 devDependencies:
+  '@types/three': 0.140.0
   prettier: 2.6.2
   typescript: 4.7.2
   vite: 2.9.9
 
 packages:
+
+  /@types/three/0.140.0:
+    resolution: {integrity: sha512-YPJLSIY6uKUOp1k6BZYDq5GtEIdhfeK04UCbc9IPAVbdn/RNjkfrbnyd7smrsNkJhc0IFASLpd3AAYgwqgXKVQ==}
+    dev: true
 
   /esbuild-android-64/0.14.40:
     resolution: {integrity: sha512-+69t+bmJWWhTyG8waJZcu4UGzM4NbDXAwssTEDYwonyz6L/Is11Y3csJhE16RM0a1GeDin0n810vNP+NVjttKA==}
@@ -300,6 +310,10 @@ packages:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
     dev: true
+
+  /three/0.141.0:
+    resolution: {integrity: sha512-JaSDAPWuk4RTzG5BYRQm8YZbERUxTfTDVouWgHMisS2to4E5fotMS9F2zPFNOIJyEFTTQDDKPpsgZVThKU3pXA==}
+    dev: false
 
   /typescript/4.7.2:
     resolution: {integrity: sha512-Mamb1iX2FDUpcTRzltPxgWMKy3fhg0TN378ylbktPGPK/99KbDtMQ4W1hwgsbPAsG3a0xKa1vmw4VKZQbkvz5A==}
