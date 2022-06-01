@@ -8,10 +8,11 @@ import {
   Vector3,
   WebGLRenderer,
 } from "three";
-import { TrackballControls } from "three/examples/jsm/controls/TrackballControls";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { ConvexGeometry } from "three/examples/jsm/geometries/ConvexGeometry";
 import untypedData from "./data.json";
 import { randomPick, randomNPick, normalize } from "./lib";
+import { GLTFExporter } from "three/examples/jsm/exporters/GLTFExporter";
 
 const nRandomPointsAround = (n: number, center: Vector3, dist: number) =>
   Array(n)
@@ -42,22 +43,21 @@ const camera = new PerspectiveCamera(
 );
 
 camera.position.set(1, 1, 1);
-const controls = new TrackballControls(camera, renderer.domElement);
+const controls = new OrbitControls(camera, renderer.domElement);
 
-const green = new DirectionalLight(0x008800, 0.5);
-green.position.set(-1, 0, 0);
-const white = new DirectionalLight(0x888888, 0.5);
-white.position.set(0, 1, 0);
-const blue = new DirectionalLight(0x000088, 0.5);
-blue.position.set(1, 0, 0);
+const green = new DirectionalLight(0x008800, 0.2);
+green.target.position.set(-1, 0, 0);
+const white = new DirectionalLight(0x888888, 1);
+const blue = new DirectionalLight(0x000088, 0.2);
+blue.target.position.set(1, 0, 0);
 const ambient = new AmbientLight(0x888888, 0.2);
-scene.add(green, white, blue, ambient);
+scene.add(green, green.target, white, blue, blue.target, ambient);
 
 const pointsPerNode = 4;
 const linkPoints = 3; // <= pointsPerNode
 const nbSamples = 100;
 const nbPaths = 4;
-const nodeRadius = 0.02;
+const nodeRadius = 0.08;
 
 const material = new MeshStandardMaterial();
 const source = randomPick(data);
@@ -104,7 +104,6 @@ animate();
 window.addEventListener(
   "resize",
   () => {
-    debugger;
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     controls.update();
@@ -112,3 +111,19 @@ window.addEventListener(
   },
   false
 );
+
+const exporter = new GLTFExporter();
+document.addEventListener("keypress", (evt) => {
+  if (evt.key !== "s") return;
+  exporter.parse(
+    scene,
+    (gltf) => {
+      const a = document.createElement("a");
+      a.download = `tree-${Math.random().toFixed(16).slice(2, 6)}.glb`;
+      a.href = URL.createObjectURL(new Blob([gltf as ArrayBuffer]));
+      a.click();
+    },
+    console.error,
+    { binary: true }
+  );
+});
