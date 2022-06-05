@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "dependencies": {
     "@types/node": "^17.0.40",
     "prettier": "^2.6.2",
