@@ -1,8 +1,6 @@
 import createCsvStreamProcessor from "./createCsvStreamProcessor";
 
-const createArduinoReader = async (
-  cb: (port: SerialPort, evt: number[]) => any
-) => {
+export default async (cb: (port: SerialPort, evt: number[]) => any) => {
   const decoder = new TextDecoder();
   const ports = await navigator.serial.getPorts();
   for (const port of ports) {
@@ -20,5 +18,3 @@ const createArduinoReader = async (
     }
   }
 };
-
-export default createArduinoReader;

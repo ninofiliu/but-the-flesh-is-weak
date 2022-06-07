@@ -1,9 +1,9 @@
-import createMockReader from "./createMockReader";
+import listenMock from "./listenMock";
 import createPlotter from "./createPlotter";
 // import salome from "./sounds/salome.mp3";
 
 const plotter = createPlotter();
-createMockReader((port, evt) => {
+listenMock((port, evt) => {
   plotter.data = evt;
 });
 
