@@ -3,8 +3,13 @@ import createCsvStreamProcessor from "./createCsvStreamProcessor";
 export default async (cb: (port: SerialPort, evt: number[]) => any) => {
   const decoder = new TextDecoder();
   const ports = await navigator.serial.getPorts();
-  for (const port of ports) {
-    if (!port.readable) throw new Error("can not read");
+  ports.forEach(async (port) => {
+    console.log(port);
+    if (!port.readable) {
+      console.log("can not read", port);
+      return;
+    }
+    console.log("can read");
     const reader = port.readable.getReader();
 
     const csp = createCsvStreamProcessor((evt) => cb(port, evt));
@@ -16,5 +21,5 @@ export default async (cb: (port: SerialPort, evt: number[]) => any) => {
       }
       csp.addChunk(decoder.decode(value));
     }
-  }
+  });
 };
