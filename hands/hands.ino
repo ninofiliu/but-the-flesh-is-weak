@@ -1,10 +1,7 @@
-void setup() {
-  Serial.begin(9600);
-  pinMode(7, INPUT);
-}
+void setup() { Serial.begin(9600); }
+
 void loop() {
-  Serial.print(digitalRead(7));
+  Serial.print(analogRead(A0));
   Serial.print(",");
-  Serial.println(analogRead(A0));
-  delay(1000);
+  Serial.println(analogRead(A1));
 }

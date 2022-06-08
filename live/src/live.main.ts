@@ -1,11 +1,14 @@
 export {};
 
-const decoder = new TextDecoder();
+const onData = (ns: number[]) => {
+  console.log(ns.join("\n"));
+};
 
 const startButton = document.createElement("button");
 startButton.textContent = "start";
 document.body.append(startButton);
 startButton.addEventListener("click", async () => {
+  const decoder = new TextDecoder();
   const [port] = await navigator.serial.getPorts();
   // const port = await navigator.serial.requestPort();
   await port.open({ baudRate: 9600 });
@@ -35,7 +38,11 @@ startButton.addEventListener("click", async () => {
         dataLine.push(+nStr);
         nStr = "";
         if (char === "\n") {
-          console.log(dataLine);
+          if (dataLine.length === 2) {
+            onData(dataLine);
+          } else {
+            console.log("garbage data:", dataLine);
+          }
           dataLine = [];
         }
       } else {
