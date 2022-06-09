@@ -4,6 +4,17 @@ import humSrc from "./sounds/amo/ii. humility 2.mp3";
 import fastSrc from "./sounds/amo/i. fast touch.mp3";
 import _ from "lodash";
 
+const ports = await navigator.serial.getPorts();
+console.log(ports);
+
+const requestPortsButton = document.createElement("button");
+requestPortsButton.textContent = "Request ports";
+requestPortsButton.addEventListener("click", async () => {
+  await navigator.serial.requestPort();
+  history.go(0);
+});
+document.body.append(requestPortsButton, document.createElement("hr"));
+
 const ac = new AudioContext();
 
 const createStart = async (src: string, wait: number) => {
@@ -39,8 +50,7 @@ humGain.gain.value = 0;
 
 const startFast = await createStart(fastSrc, 1000 / 2);
 
-const ports = await navigator.serial.getPorts();
-ports.forEach(async (port, portIndex) => {
+ports.forEach(async (port) => {
   let hum = 0;
 
   const params = {
@@ -68,7 +78,7 @@ ports.forEach(async (port, portIndex) => {
   const canvas = document.createElement("canvas");
   canvas.style.border = "1px solid black";
   canvas.style.display = "block";
-  document.body.append(canvas);
+  document.body.append(canvas, document.createElement("hr"));
   const ctx = canvas.getContext("2d")!;
 
   let x = 0;
@@ -84,13 +94,12 @@ ports.forEach(async (port, portIndex) => {
   };
 
   listen(port, (ns) => {
-    console.log(portIndex, ...ns);
+    // console.log(portIndex, ...ns);
     const humNorm = (ns[0] - params.humBase) / (params.humTop - params.humBase);
     hum = params.humSmooth * hum + (1 - params.humSmooth) * humNorm;
-    humGain.gain.value = Math.max(
-      0,
-      (hum - params.humThreshold) / (1 - params.humThreshold)
-    );
+    humGain.gain.value =
+      0.9 *
+      Math.max(0, (hum - params.humThreshold) / (1 - params.humThreshold));
     plot({
       blue: hum,
       steelblue: params.humThreshold,

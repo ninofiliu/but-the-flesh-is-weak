@@ -5,20 +5,12 @@ export default async (port: SerialPort, onData: (nbs: number[]) => any) => {
   const decoder = new TextDecoder();
   const reader = port.readable.getReader();
 
-  let willStop = false;
-  const stopButton = document.createElement("button");
-  stopButton.textContent = "stop";
-  document.body.append(stopButton);
-  stopButton.addEventListener("click", () => {
-    willStop = true;
-  });
-
   let nStr = "";
   let nbs = [];
 
   while (true) {
     const { value, done } = await reader.read();
-    if (done || willStop) {
+    if (done) {
       reader.releaseLock();
       history.go(0);
     }
