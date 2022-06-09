@@ -3,6 +3,7 @@ import bgSrc from "./sounds/amo/composition.mp3";
 import humSrc from "./sounds/amo/ii. humility 2.mp3";
 import fastSrc from "./sounds/amo/i. fast touch.mp3";
 import _ from "lodash";
+import mockListen from "./mockListen";
 
 (async () => {
   const ports = await navigator.serial.getPorts();
@@ -51,13 +52,13 @@ import _ from "lodash";
 
   const startFast = await createStart(fastSrc, 1000 / 2);
 
-  ports.forEach(async (port, portIndex) => {
+  (ports.length === 0 ? [null] : ports).forEach(async (port, portIndex) => {
     let hum = 0;
 
     const params = {
       humSmooth: 0.95,
       humBase: 1024,
-      humTop: 980,
+      humTop: 0,
       humThreshold: 0.2,
     } as Record<string, number>;
 
@@ -94,7 +95,7 @@ import _ from "lodash";
       x = (x + 1) % canvas.width;
     };
 
-    listen(port, (ns) => {
+    const onData = (ns: number[]) => {
       console.log(portIndex, ...ns);
       const humNorm =
         (ns[0] - params.humBase) / (params.humTop - params.humBase);
@@ -107,7 +108,13 @@ import _ from "lodash";
         steelblue: params.humThreshold,
         red: ns[1] / 1024,
       });
-    });
+    };
+
+    if (port) {
+      listen(port, onData);
+    } else {
+      mockListen(onData);
+    }
   });
 
   // DEBUG
