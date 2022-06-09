@@ -12,14 +12,6 @@ import mockListen from "./mockListen";
     : await navigator.serial.getPorts();
   console.log(maybePorts);
 
-  const requestPortsButton = document.createElement("button");
-  requestPortsButton.textContent = "Request ports";
-  requestPortsButton.addEventListener("click", async () => {
-    await navigator.serial.requestPort();
-    history.go(0);
-  });
-  document.body.append(requestPortsButton, document.createElement("hr"));
-
   const ac = new AudioContext();
 
   const createStart = async (src: string, wait: number) => {
