@@ -12,3 +12,10 @@ button:hover {
   background-color: black;
   color: white;
 }
+svg {
+  background-color: #eee;
+  margin-right: 1rem;
+}
+.Graph {
+  display: flex;
+}

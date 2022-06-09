@@ -1,18 +1,31 @@
-import React, { useEffect } from "react";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
+import Controller from "./Controller";
 import Status from "./Status";
 
 export default () => {
-  const [ports, setPorts] = useState<SerialPort[]>([]);
-
   const supported = "serial" in navigator;
+  const [maybePorts, setMaybePorts] = useState<SerialPort[] | null[]>([]);
 
   useEffect(() => {
     (async () => {
-      if (!supported) return;
-      setPorts(await navigator.serial.getPorts());
+      if (supported) {
+        setMaybePorts(await navigator.serial.getPorts());
+      } else {
+        setMaybePorts([null]);
+      }
     })();
   }, []);
 
-  return <Status supported={supported} ports={ports} />;
+  return (
+    <>
+      <Status supported={supported} />
+      {maybePorts.map((maybePort, portIndex) => (
+        <Controller
+          key={portIndex}
+          maybePort={maybePort}
+          portIndex={portIndex}
+        />
+      ))}
+    </>
+  );
 };

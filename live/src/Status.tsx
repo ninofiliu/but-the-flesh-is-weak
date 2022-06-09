@@ -1,12 +1,6 @@
 import React from "react";
 
-export default ({
-  supported,
-  ports,
-}: {
-  supported: boolean;
-  ports: SerialPort[];
-}) => {
+export default ({ supported }: { supported: boolean }) => {
   const requestPort = async () => {
     if (!supported) return alert("Not supported");
     try {
@@ -30,7 +24,6 @@ export default ({
           (not Chromium). In the meantime, mock data will be displayed.
         </p>
       )}
-      <p>{ports.length} ports connected</p>
       <p>
         <button onClick={requestPort}>Request port</button>
       </p>
