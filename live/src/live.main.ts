@@ -51,7 +51,7 @@ import _ from "lodash";
 
   const startFast = await createStart(fastSrc, 1000 / 2);
 
-  ports.forEach(async (port) => {
+  ports.forEach(async (port, portIndex) => {
     let hum = 0;
 
     const params = {
@@ -95,7 +95,7 @@ import _ from "lodash";
     };
 
     listen(port, (ns) => {
-      // console.log(portIndex, ...ns);
+      console.log(portIndex, ...ns);
       const humNorm =
         (ns[0] - params.humBase) / (params.humTop - params.humBase);
       hum = params.humSmooth * hum + (1 - params.humSmooth) * humNorm;
