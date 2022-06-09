@@ -16,6 +16,10 @@
     "vite": "^2.9.9"
   },
   "dependencies": {
-    "lodash": "^4.17.21"
+    "@types/react": "^18.0.12",
+    "@types/react-dom": "^18.0.5",
+    "lodash": "^4.17.21",
+    "react": "^18.1.0",
+    "react-dom": "^18.1.0"
   }
 }
