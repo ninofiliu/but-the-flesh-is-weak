@@ -1,18 +1,28 @@
 lockfileVersion: 5.4
 
 specifiers:
+  '@types/lodash': ^4.14.182
   '@types/w3c-web-serial': ^1.0.2
   '@types/w3c-web-usb': ^1.0.6
+  lodash: ^4.17.21
   typescript: ^4.5.4
   vite: ^2.9.9
 
+dependencies:
+  lodash: 4.17.21
+
 devDependencies:
+  '@types/lodash': 4.14.182
   '@types/w3c-web-serial': 1.0.2
   '@types/w3c-web-usb': 1.0.6
   typescript: 4.7.3
   vite: 2.9.9
 
 packages:
+
+  /@types/lodash/4.14.182:
+    resolution: {integrity: sha512-/THyiqyQAP9AfARo4pF+aCGcyiQ94tX/Is2I7HofNRqoYLgN1PBoOWu2/zTA5zMxzP5EFutMtWtGAFRKUe961Q==}
+    dev: true
 
   /@types/w3c-web-serial/1.0.2:
     resolution: {integrity: sha512-Ftx4BtLxgAnel7V7GbHylCYjSq827A+jeEE3SnTS7huCGUN0pSwUn+CchTCT9TkZj9w+NVMUq4Bk2R0GvUNmAQ==}
@@ -254,6 +264,10 @@ packages:
     dependencies:
       has: 1.0.3
     dev: true
+
+  /lodash/4.17.21:
+    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
+    dev: false
 
   /nanoid/3.3.4:
     resolution: {integrity: sha512-MqBkQh/OHTS2egovRtLk45wEyNXwF+cokD+1YPf9u5VfJiRdAiRwB2froX5Co9Rh20xs4siNPm8naNotSD6RBw==}
