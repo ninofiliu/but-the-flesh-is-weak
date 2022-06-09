@@ -6,8 +6,11 @@ import _ from "lodash";
 import mockListen from "./mockListen";
 
 (async () => {
-  const ports = await navigator.serial.getPorts();
-  console.log(ports);
+  const shouldMock = !("serial" in navigator);
+  const maybePorts = shouldMock
+    ? [null, null]
+    : await navigator.serial.getPorts();
+  console.log(maybePorts);
 
   const requestPortsButton = document.createElement("button");
   requestPortsButton.textContent = "Request ports";
@@ -52,7 +55,7 @@ import mockListen from "./mockListen";
 
   const startFast = await createStart(fastSrc, 1000 / 2);
 
-  (ports.length === 0 ? [null] : ports).forEach(async (port, portIndex) => {
+  maybePorts.forEach(async (maybePort, portIndex) => {
     let hum = 0;
 
     const params = {
@@ -110,8 +113,8 @@ import mockListen from "./mockListen";
       });
     };
 
-    if (port) {
-      listen(port, onData);
+    if (maybePort) {
+      listen(maybePort, onData);
     } else {
       mockListen(onData);
     }
