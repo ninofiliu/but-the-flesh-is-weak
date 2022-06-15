@@ -19,3 +19,10 @@ svg {
 .Graph {
   display: flex;
 }
+.control-row {
+  display: flex;
+  align-items: center;
+}
+.control-row input {
+  margin-right: 1rem;
+}

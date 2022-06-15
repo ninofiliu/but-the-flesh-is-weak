@@ -4,7 +4,7 @@ type Values = {
   [color: string]: number;
 };
 
-const nbAllValues = 500;
+const nbAllValues = 100;
 const width = 500;
 const height = 250;
 
