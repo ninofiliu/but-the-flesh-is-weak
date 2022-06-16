@@ -8,7 +8,7 @@ const nbAllValues = 128;
 const width = 256;
 const height = 128;
 
-export default ({ values, title }: { values: Values; title: string }) => {
+export default ({ values }: { values: Values }) => {
   const [allValues, setAllValues] = useState<Values[]>(
     Array(nbAllValues).fill({})
   );
@@ -57,21 +57,18 @@ export default ({ values, title }: { values: Values; title: string }) => {
           </>
         )}
       </svg>
-      <div>
+      {isHovering && (
         <div>
-          <b>{title}</b>
-        </div>
-        {isHovering && (
-          <>
-            <div>{dataY(hoverY)}</div>
-            {Object.entries(allValues[dataI(hoverX)]).map(([color, value]) => (
+          <div>{dataY(hoverY)}</div>
+          {Object.entries(allValues[dataI(hoverX)])
+            .sort(([, valueA], [, valueB]) => valueB - valueA)
+            .map(([color, value]) => (
               <div key={color} style={{ color }}>
                 {value}
               </div>
             ))}
-          </>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };
