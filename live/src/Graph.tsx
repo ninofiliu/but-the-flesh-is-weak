@@ -4,21 +4,11 @@ type Values = {
   [color: string]: number;
 };
 
-const nbAllValues = 100;
-const width = 500;
-const height = 250;
+const nbAllValues = 128;
+const width = 256;
+const height = 128;
 
-export default ({
-  values,
-  title,
-  min,
-  max,
-}: {
-  values: Values;
-  title: string;
-  min: number;
-  max: number;
-}) => {
+export default ({ values, title }: { values: Values; title: string }) => {
   const [allValues, setAllValues] = useState<Values[]>(
     Array(nbAllValues).fill({})
   );
@@ -35,8 +25,8 @@ export default ({
     setHoverY(evt.nativeEvent.offsetY);
   };
 
-  const domY = (dataY: number) => height * (1 - (dataY - min) / (max - min));
-  const dataY = (domY: number) => max - ((max - min) * domY) / height;
+  const domY = (dataY: number) => height * (1 - dataY);
+  const dataY = (domY: number) => 1 - domY / height;
   const dataI = (domX: number) => Math.floor((domX / width) * nbAllValues);
 
   return (

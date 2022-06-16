@@ -3,7 +3,7 @@ import Status from "./Status";
 import Graph from "./Graph";
 import listen from "./listen";
 import mockListen from "./mockListen";
-import touch from "./sounds/amo/touch.mp3";
+import touchSrc from "./sounds/amo/touch.mp3";
 
 const ac = new AudioContext();
 
@@ -19,56 +19,13 @@ const ac = new AudioContext();
 //   return gain;
 // };
 
-const TouchController = ({ raw }: { raw: number }) => {
-  const threshold = 768;
-  const [lastRaw, setLastRaw] = useState(threshold + 1);
-  const [audioBuffer, setAudioBuffer] = useState<AudioBuffer | null>(null);
-
-  useEffect(() => {
-    (async () => {
-      const resp = await fetch(touch);
-      const arrayBuffer = await resp.arrayBuffer();
-      const audioBuffer = await ac.decodeAudioData(arrayBuffer);
-      setAudioBuffer(audioBuffer);
-    })();
-  }, []);
-
-  useEffect(() => {
-    setLastRaw(raw);
-    if (audioBuffer && lastRaw > threshold && raw < threshold) {
-      const source = ac.createBufferSource();
-      source.buffer = audioBuffer;
-      source.connect(ac.destination);
-      source.start();
-      console.log("start");
-    }
-  }, [raw]);
-
-  return (
-    <>
-      <Graph
-        title="Touch"
-        values={{ red: raw, brown: threshold }}
-        min={0}
-        max={1024}
-      />
-    </>
-  );
-};
-
-const Machine = ({
-  maybePort,
-  portIndex,
-}: {
-  maybePort: SerialPort | null;
-  portIndex: number;
-}) => {
-  const [touchRaw, setTouchRaw] = useState(NaN);
-
-  const onData = (ns: number[]) => {
-    setTouchRaw(ns[1]);
+const useListen = (maybePort: SerialPort | null) => {
+  const [a0, setA0] = useState(0);
+  const [a1, setA1] = useState(0);
+  const onData = ({ a0, a1 }: { a0: number; a1: number }) => {
+    setA0(a0);
+    setA1(a1);
   };
-
   useEffect(() => {
     (async () => {
       if (maybePort) {
@@ -79,20 +36,58 @@ const Machine = ({
     })();
   }, []);
 
+  return { a0, a1 };
+};
+
+const useTouch = (a1: number) => {
+  const threshold = 768;
+  const [lastA1, setLastA1] = useState(threshold + 1);
+  const [audioBuffer, setAudioBuffer] = useState<AudioBuffer | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      const resp = await fetch(touchSrc);
+      const arrayBuffer = await resp.arrayBuffer();
+      const audioBuffer = await ac.decodeAudioData(arrayBuffer);
+      setAudioBuffer(audioBuffer);
+    })();
+  }, []);
+
+  useEffect(() => {
+    setLastA1(a1);
+    if (audioBuffer && lastA1 > threshold && a1 < threshold) {
+      const source = ac.createBufferSource();
+      source.buffer = audioBuffer;
+      source.connect(ac.destination);
+      source.start();
+      console.log("start");
+    }
+  }, [a1]);
+
+  return { threshold };
+};
+
+const Machine = ({
+  maybePort,
+  portIndex,
+}: {
+  maybePort: SerialPort | null;
+  portIndex: number;
+}) => {
+  const { a0, a1 } = useListen(maybePort);
+  const { threshold } = useTouch(a1);
+
   return (
     <>
       <h1>Machine {portIndex}</h1>
-      {!isNaN(touchRaw) && (
-        <>
-          <Graph
-            title="Raw data"
-            values={{ red: touchRaw }}
-            min={0}
-            max={1024}
-          />
-          <TouchController raw={touchRaw} />
-        </>
-      )}
+      <Graph
+        title="Raw data"
+        values={{
+          "#00f": a0 / 1024,
+          "#f00": a1 / 1024,
+          "#800": threshold / 1024,
+        }}
+      />
     </>
   );
 };
