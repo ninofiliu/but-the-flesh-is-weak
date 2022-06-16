@@ -18,6 +18,7 @@ svg {
 }
 .Graph {
   display: flex;
+  margin: 1rem 0;
 }
 .control-row {
   display: flex;
