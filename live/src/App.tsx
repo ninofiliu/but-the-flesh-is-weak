@@ -7,9 +7,9 @@ import touchSrc from "./sounds/amo/touch.mp3";
 import waterSrc from "./sounds/amo/liquid2.mp3";
 import { Data } from "./types";
 import ac from "./ac";
+import RangeInput from "./RangeInput";
 
 const createAudioGain = (src: string) => {
-  console.log(0);
   const audio = document.createElement("audio");
   audio.src = src;
   audio.autoplay = true;
@@ -40,36 +40,6 @@ const useListen = (maybePort: SerialPort | null) => {
 
   return data;
 };
-
-const RangeInput = ({
-  value,
-  setValue,
-  name,
-}: {
-  value: number;
-  setValue: (newValue: number) => any;
-  name: string;
-}) => (
-  <div className="control-row">
-    <input
-      type="range"
-      value={value}
-      min={0}
-      max={1}
-      step={0.01}
-      onChange={(evt) => setValue(+evt.target.value)}
-    />
-    <input
-      type="number"
-      value={value}
-      min={0}
-      max={1}
-      step={0.01}
-      onChange={(evt) => setValue(+evt.target.value)}
-    />
-    {name}
-  </div>
-);
 
 const Water = ({ w }: { w: number }) => {
   const smooth = 0.5;
