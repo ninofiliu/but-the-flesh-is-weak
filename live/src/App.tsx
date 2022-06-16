@@ -39,11 +39,42 @@ const useListen = (maybePort: SerialPort | null) => {
   return { a0, a1 };
 };
 
+const RangeInput = ({
+  value,
+  setValue,
+  name,
+}: {
+  value: number;
+  setValue: (newValue: number) => any;
+  name: string;
+}) => (
+  <div className="control-row">
+    <input
+      type="range"
+      value={value}
+      min={0}
+      max={1}
+      step={0.01}
+      onChange={(evt) => setValue(+evt.target.value)}
+    />
+    <input
+      type="number"
+      value={value}
+      min={0}
+      max={1}
+      step={0.01}
+      onChange={(evt) => setValue(+evt.target.value)}
+    />
+    {name}
+  </div>
+);
+
 const Water = ({ w }: { w: number }) => {
   const smooth = 0.5;
   const [wSmooth, setWSmooth] = useState(0);
   const [wMin, setWMin] = useState(0);
   const [wMax, setWMax] = useState(1);
+  const wNorm = (wSmooth - wMin) / (wMax - wMin);
 
   const setWMinSafe = (newWMin: number) => {
     if (newWMin >= wMax) return;
@@ -61,49 +92,19 @@ const Water = ({ w }: { w: number }) => {
   return (
     <>
       <h2>Water</h2>
-      <div className="control-row">
-        <input
-          type="range"
-          value={wMin}
-          min={0}
-          max={1}
-          step={0.01}
-          onChange={(evt) => setWMinSafe(+evt.target.value)}
-        />
-        <input
-          type="number"
-          value={wMin}
-          min={0}
-          max={1}
-          step={0.01}
-          onChange={(evt) => setWMinSafe(+evt.target.value)}
-        />
-        water min
-      </div>
-      <div className="control-row">
-        <input
-          type="range"
-          value={wMax}
-          min={0}
-          max={1}
-          step={0.01}
-          onChange={(evt) => setWMaxSafe(+evt.target.value)}
-        />
-        <input
-          type="number"
-          value={wMax}
-          min={0}
-          max={1}
-          step={0.01}
-          onChange={(evt) => setWMaxSafe(+evt.target.value)}
-        />
-        water max
-      </div>
+      <RangeInput value={wMin} setValue={setWMinSafe} name="water min" />
+      <RangeInput value={wMax} setValue={setWMaxSafe} name="water max" />
       <Graph
         values={{
-          "#88f": wMin,
-          "#88e": wMax,
-          "#88d": wSmooth,
+          "#00f": w,
+          "#88f": wSmooth,
+          "#000": wMin,
+          "#001": wMax,
+        }}
+      />
+      <Graph
+        values={{
+          "#44f": wNorm,
         }}
       />
     </>
