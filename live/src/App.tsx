@@ -88,8 +88,17 @@ const Machine = ({
   return (
     <>
       <h1>Machine {portIndex}</h1>
-      <Graph title="Raw data" values={{ red: touchRaw }} min={0} max={1024} />
-      {!isNaN(touchRaw) && <TouchController raw={touchRaw} />}
+      {!isNaN(touchRaw) && (
+        <>
+          <Graph
+            title="Raw data"
+            values={{ red: touchRaw }}
+            min={0}
+            max={1024}
+          />
+          <TouchController raw={touchRaw} />
+        </>
+      )}
     </>
   );
 };
