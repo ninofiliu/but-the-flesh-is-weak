@@ -39,7 +39,7 @@ const useListen = (maybePort: SerialPort | null) => {
   return { a0, a1 };
 };
 
-const useWater = ({ w }: { w: number }) => {
+const Water = ({ w }: { w: number }) => {
   const smooth = 0.5;
   const [wSmooth, setWSmooth] = useState(0);
   const [wMin, setWMin] = useState(0);
@@ -58,51 +58,9 @@ const useWater = ({ w }: { w: number }) => {
     setWSmooth(smooth * wSmooth + (1 - smooth) * w);
   }, [w]);
 
-  return { wSmooth, wMin, setWMinSafe, wMax, setWMaxSafe };
-};
-
-const useTouch = (a1: number) => {
-  const threshold = 0.75;
-  const [lastA1, setLastA1] = useState(threshold + 1);
-  const [audioBuffer, setAudioBuffer] = useState<AudioBuffer | null>(null);
-
-  useEffect(() => {
-    (async () => {
-      const resp = await fetch(touchSrc);
-      const arrayBuffer = await resp.arrayBuffer();
-      const audioBuffer = await ac.decodeAudioData(arrayBuffer);
-      setAudioBuffer(audioBuffer);
-    })();
-  }, []);
-
-  useEffect(() => {
-    setLastA1(a1);
-    if (audioBuffer && lastA1 > threshold && a1 < threshold) {
-      const source = ac.createBufferSource();
-      source.buffer = audioBuffer;
-      source.connect(ac.destination);
-      source.start();
-      console.log("start");
-    }
-  }, [a1]);
-
-  return { threshold };
-};
-
-const Machine = ({
-  maybePort,
-  portIndex,
-}: {
-  maybePort: SerialPort | null;
-  portIndex: number;
-}) => {
-  const { a0, a1 } = useListen(maybePort);
-  const { wSmooth, wMin, setWMinSafe, wMax, setWMaxSafe } = useWater({ w: a0 });
-  const { threshold } = useTouch(a1);
-
   return (
     <>
-      <h1>Machine {portIndex}</h1>
+      <h2>Water</h2>
       <div className="control-row">
         <input
           type="range"
@@ -143,14 +101,72 @@ const Machine = ({
       </div>
       <Graph
         values={{
-          "#00f": a0,
           "#88f": wMin,
           "#88e": wMax,
           "#88d": wSmooth,
-          "#f00": a1,
+        }}
+      />
+    </>
+  );
+};
+
+const Touch = ({ t }: { t: number }) => {
+  const threshold = 0.75;
+  const [lastT, setLastT] = useState(threshold + 1);
+  const [audioBuffer, setAudioBuffer] = useState<AudioBuffer | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      const resp = await fetch(touchSrc);
+      const arrayBuffer = await resp.arrayBuffer();
+      const audioBuffer = await ac.decodeAudioData(arrayBuffer);
+      setAudioBuffer(audioBuffer);
+    })();
+  }, []);
+
+  useEffect(() => {
+    setLastT(t);
+    if (audioBuffer && lastT > threshold && t < threshold) {
+      const source = ac.createBufferSource();
+      source.buffer = audioBuffer;
+      source.connect(ac.destination);
+      source.start();
+      console.log("start");
+    }
+  }, [t]);
+  return (
+    <>
+      <h2>Touch</h2>
+      <Graph
+        values={{
+          "#f00": t,
           "#800": threshold,
         }}
       />
+    </>
+  );
+};
+
+const Machine = ({
+  maybePort,
+  portIndex,
+}: {
+  maybePort: SerialPort | null;
+  portIndex: number;
+}) => {
+  const { a0, a1 } = useListen(maybePort);
+
+  return (
+    <>
+      <h1>Machine {portIndex}</h1>
+      <Graph
+        values={{
+          "#00f": a0,
+          "#f00": a1,
+        }}
+      />
+      <Water w={a0} />
+      <Touch t={a1} />
     </>
   );
 };
