@@ -1,7 +1,6 @@
-export default async (
-  port: SerialPort,
-  onData: ({ a0, a1 }: { a0: number; a1: number }) => any
-) => {
+import { Data } from "./types";
+
+export default async (port: SerialPort, onData: (data: Data) => any) => {
   await port.open({ baudRate: 9600 });
   if (!port.readable) throw new Error("can not read");
 
@@ -22,10 +21,11 @@ export default async (
         nbs.push(+nStr);
         nStr = "";
         if (char === "\n") {
-          if (nbs.length === 2 && nbs.every((n) => !Number.isNaN(n))) {
+          if (nbs.length === 3 && nbs.every((n) => !Number.isNaN(n))) {
             onData({
               a0: nbs[0] / 1024,
               a1: nbs[1] / 1024,
+              a2: nbs[2] / 1024,
             });
           } else {
             console.log("garbage data:", nbs);

@@ -4,39 +4,41 @@ import Graph from "./Graph";
 import listen from "./listen";
 import mockListen from "./mockListen";
 import touchSrc from "./sounds/amo/touch.mp3";
+import waterSrc from "./sounds/amo/liquid2.mp3";
+import { Data } from "./types";
+import ac from "./ac";
 
-const ac = new AudioContext();
-
-// const createAudioGain = (src: string) => {
-//   const audio = document.createElement("audio");
-//   audio.src = src;
-//   audio.autoplay = true;
-//   audio.loop = true;
-//   const source = ac.createMediaElementSource(audio);
-//   const gain = ac.createGain();
-//   source.connect(gain);
-//   gain.connect(ac.destination);
-//   return gain;
-// };
+const createAudioGain = (src: string) => {
+  console.log(0);
+  const audio = document.createElement("audio");
+  audio.src = src;
+  audio.autoplay = true;
+  audio.loop = true;
+  const source = ac.createMediaElementSource(audio);
+  const gain = ac.createGain();
+  source.connect(gain);
+  gain.connect(ac.destination);
+  return gain;
+};
 
 const useListen = (maybePort: SerialPort | null) => {
-  const [a0, setA0] = useState(0);
-  const [a1, setA1] = useState(0);
-  const onData = ({ a0, a1 }: { a0: number; a1: number }) => {
-    setA0(a0);
-    setA1(a1);
-  };
+  const [data, setData] = useState<Data>({
+    a0: 0,
+    a1: 0,
+    a2: 0,
+  });
+
   useEffect(() => {
     (async () => {
       if (maybePort) {
-        listen(maybePort, onData);
+        listen(maybePort, setData);
       } else {
-        mockListen(onData);
+        mockListen(setData);
       }
     })();
   }, []);
 
-  return { a0, a1 };
+  return data;
 };
 
 const RangeInput = ({
@@ -75,6 +77,7 @@ const Water = ({ w }: { w: number }) => {
   const [wMin, setWMin] = useState(0);
   const [wMax, setWMax] = useState(1);
   const wNorm = (wSmooth - wMin) / (wMax - wMin);
+  const [gain, setGain] = useState<GainNode | null>(null);
 
   const setWMinSafe = (newWMin: number) => {
     if (newWMin >= wMax) return;
@@ -87,7 +90,14 @@ const Water = ({ w }: { w: number }) => {
 
   useEffect(() => {
     setWSmooth(smooth * wSmooth + (1 - smooth) * w);
+    if (gain) {
+      gain.gain.value = Math.max(0, Math.min(1, wNorm));
+    }
   }, [w]);
+
+  useEffect(() => {
+    setGain(createAudioGain(waterSrc));
+  }, []);
 
   return (
     <>
