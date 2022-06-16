@@ -21,7 +21,7 @@ const ac = new AudioContext();
 
 const TouchController = ({ raw }: { raw: number }) => {
   const threshold = 768;
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [lastRaw, setLastRaw] = useState(threshold + 1);
   const [audioBuffer, setAudioBuffer] = useState<AudioBuffer | null>(null);
 
   useEffect(() => {
@@ -34,21 +34,15 @@ const TouchController = ({ raw }: { raw: number }) => {
   }, []);
 
   useEffect(() => {
-    if (audioBuffer && !isPlaying && raw < threshold) {
+    setLastRaw(raw);
+    if (audioBuffer && lastRaw > threshold && raw < threshold) {
       const source = ac.createBufferSource();
       source.buffer = audioBuffer;
       source.connect(ac.destination);
       source.start();
-      setIsPlaying(true);
-      source.addEventListener("ended", () => {
-        setIsPlaying(false);
-      });
+      console.log("start");
     }
   }, [raw]);
-
-  useEffect(() => {
-    console.log({ isPlaying });
-  }, [isPlaying]);
 
   return (
     <>
