@@ -40,7 +40,7 @@ const useListen = (maybePort: SerialPort | null) => {
 };
 
 const useTouch = (a1: number) => {
-  const threshold = 768;
+  const threshold = 0.75;
   const [lastA1, setLastA1] = useState(threshold + 1);
   const [audioBuffer, setAudioBuffer] = useState<AudioBuffer | null>(null);
 
@@ -83,9 +83,9 @@ const Machine = ({
       <Graph
         title="Raw data"
         values={{
-          "#00f": a0 / 1024,
-          "#f00": a1 / 1024,
-          "#800": threshold / 1024,
+          "#00f": a0,
+          "#f00": a1,
+          "#800": threshold,
         }}
       />
     </>

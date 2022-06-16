@@ -24,8 +24,8 @@ export default async (
         if (char === "\n") {
           if (nbs.length === 2 && nbs.every((n) => !Number.isNaN(n))) {
             onData({
-              a0: nbs[0],
-              a1: nbs[1],
+              a0: nbs[0] / 1024,
+              a1: nbs[1] / 1024,
             });
           } else {
             console.log("garbage data:", nbs);
