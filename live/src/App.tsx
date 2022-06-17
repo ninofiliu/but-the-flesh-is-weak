@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from "react";
 import Status from "./Status";
 import Graph from "./Graph";
-import listen from "./listen";
-import mockListen from "./mockListen";
 import touchSrc from "./sounds/amo/touch.mp3";
 import waterSrc from "./sounds/amo/liquid2.mp3";
-import { Data } from "./types";
 import ac from "./ac";
 import RangeInput from "./RangeInput";
+import useListen from "./useListen";
 
 const createAudioGain = (src: string) => {
   const audio = document.createElement("audio");
@@ -19,26 +17,6 @@ const createAudioGain = (src: string) => {
   source.connect(gain);
   gain.connect(ac.destination);
   return gain;
-};
-
-const useListen = (maybePort: SerialPort | null) => {
-  const [data, setData] = useState<Data>({
-    a0: 0,
-    a1: 0,
-    a2: 0,
-  });
-
-  useEffect(() => {
-    (async () => {
-      if (maybePort) {
-        listen(maybePort, setData);
-      } else {
-        mockListen(setData);
-      }
-    })();
-  }, []);
-
-  return data;
 };
 
 const MinMax = ({ raw, name }: { raw: number; name: string }) => {
