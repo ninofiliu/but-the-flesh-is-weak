@@ -1,17 +1,6 @@
 :root {
   font-family: monospace;
 }
-button {
-  font: inherit;
-  border: 1px solid black;
-  border-radius: none;
-  background: transparent;
-}
-button:hover {
-  cursor: pointer;
-  background-color: black;
-  color: white;
-}
 svg {
   background-color: #eee;
   margin-right: 1rem;

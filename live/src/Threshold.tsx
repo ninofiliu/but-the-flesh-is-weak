@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-
-import touchSrc from "./sounds/amo/touch.mp3";
+import touch from "./sounds/amo/touch.mp3";
 import ac from "./ac";
 import Graph from "./Graph";
+import SrcPicker from "./SrcPicker";
 
 export default ({
   raw,
@@ -15,15 +15,16 @@ export default ({
 }) => {
   const [lastValue, setLastValue] = useState(threshold + 1);
   const [audioBuffer, setAudioBuffer] = useState<AudioBuffer | null>(null);
+  const [src, setSrc] = useState(touch);
 
   useEffect(() => {
     (async () => {
-      const resp = await fetch(touchSrc);
+      const resp = await fetch(src);
       const arrayBuffer = await resp.arrayBuffer();
       const audioBuffer = await ac.decodeAudioData(arrayBuffer);
       setAudioBuffer(audioBuffer);
     })();
-  }, []);
+  }, [src]);
 
   useEffect(() => {
     setLastValue(raw);
@@ -39,6 +40,7 @@ export default ({
   return (
     <>
       <h2>{name}</h2>
+      <SrcPicker value={src} onChange={setSrc} />
       <Graph
         values={{
           "#f00": raw,
