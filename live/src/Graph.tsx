@@ -38,10 +38,10 @@ export default ({ values }: { values: Values }) => {
           Object.entries(values).map(([color, value]) => (
             <rect
               key={`${i}-${color}`}
-              x={(width * i) / nbAllValues}
-              y={domY(value)}
-              width={width / nbAllValues}
-              height={1}
+              x={(width * i) / nbAllValues - 1}
+              y={domY(value) - 1}
+              width={width / nbAllValues + 1}
+              height={3}
               fill={color}
             />
           ))

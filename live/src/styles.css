@@ -1,16 +1,20 @@
 :root {
   font-family: monospace;
+  background-color: #222;
+  color-scheme: dark;
 }
 h1:hover {
   cursor: pointer;
 }
 svg {
-  background-color: #eee;
+  background-color: black;
   margin-right: 1rem;
 }
 .Graph {
-  display: flex;
   margin: 1rem 0;
+}
+.machines {
+  display: flex;
 }
 .control-row {
   display: flex;

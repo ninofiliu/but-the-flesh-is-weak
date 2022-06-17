@@ -24,7 +24,7 @@ const Machine = ({
   }, [gain]);
 
   return (
-    <>
+    <div className="Machine">
       <h1 onClick={() => setOpened(!opened)}>Machine {portIndex}</h1>
       {opened && (
         <>
@@ -40,7 +40,7 @@ const Machine = ({
           <MinMax name="flex" raw={a2} />
         </>
       )}
-    </>
+    </div>
   );
 };
 
@@ -61,9 +61,15 @@ export default () => {
   return (
     <>
       <Status supported={supported} />
-      {maybePorts.map((maybePorts, portIndex) => (
-        <Machine key={portIndex} portIndex={portIndex} maybePort={maybePorts} />
-      ))}
+      <div className="machines">
+        {maybePorts.map((maybePorts, portIndex) => (
+          <Machine
+            key={portIndex}
+            portIndex={portIndex}
+            maybePort={maybePorts}
+          />
+        ))}
+      </div>
     </>
   );
 };
