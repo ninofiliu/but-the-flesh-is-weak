@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import water from "./sounds/amo/liquid2.mp3";
 import SrcPicker from "./SrcPicker";
 import RangeInput from "./RangeInput";
 import React from "react";
@@ -12,7 +11,6 @@ export default ({ raw, name }: { raw: number; name: string }) => {
   const [min, setMin] = useState(0);
   const [max, setMax] = useState(1);
   const norm = (smooth - min) / (max - min);
-  const [src, setSrc] = useState(water);
   const [gain, setGain] = useState<GainNode | null>(null);
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
 
@@ -36,7 +34,6 @@ export default ({ raw, name }: { raw: number; name: string }) => {
     const audio = document.createElement("audio");
     audio.autoplay = true;
     audio.loop = true;
-    audio.src = src;
     const source = ac.createMediaElementSource(audio);
     const gain = ac.createGain();
     source.connect(gain);
@@ -46,16 +43,13 @@ export default ({ raw, name }: { raw: number; name: string }) => {
   }, []);
 
   const updateSrc = (newSrc: string) => {
-    if (audio) {
-      audio.src = newSrc;
-      setSrc(newSrc);
-    }
+    audio!.src = newSrc;
   };
 
   return (
     <>
       <h2>{name}</h2>
-      <SrcPicker value={src} onChange={updateSrc} />
+      <SrcPicker value={audio?.src ?? ""} onChange={updateSrc} />
       <RangeInput value={min} setValue={setMinSafe} name="min" />
       <RangeInput value={max} setValue={setMaxSafe} name="max" />
       <Graph
