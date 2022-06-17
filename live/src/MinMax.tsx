@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import SrcPicker from "./SrcPicker";
 import RangeInput from "./RangeInput";
 import React from "react";
