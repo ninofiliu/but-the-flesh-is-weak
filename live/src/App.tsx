@@ -12,19 +12,26 @@ const Machine = ({
   maybePort: SerialPort | null;
   portIndex: number;
 }) => {
-  const { a0, a1 } = useListen(maybePort);
+  const [opened, setOpened] = useState(true);
+  const { a0, a1, a2 } = useListen(maybePort);
 
   return (
     <>
-      <h1>Machine {portIndex}</h1>
-      <Graph
-        values={{
-          "#00f": a0,
-          "#f00": a1,
-        }}
-      />
-      <MinMax name="water" raw={a0} />
-      <Threshold name="touch" raw={a1} threshold={0.75} />
+      <h1 onClick={() => setOpened(!opened)}>Machine {portIndex}</h1>
+      {opened && (
+        <>
+          <Graph
+            values={{
+              "#00f": a0,
+              "#f00": a1,
+              "#0c0": a2,
+            }}
+          />
+          <MinMax name="water" raw={a0} />
+          <Threshold name="touch" raw={a1} threshold={0.75} />
+          <MinMax name="flex" raw={a2} />
+        </>
+      )}
     </>
   );
 };

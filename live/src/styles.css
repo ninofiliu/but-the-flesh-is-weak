@@ -1,6 +1,9 @@
 :root {
   font-family: monospace;
 }
+h1:hover {
+  cursor: pointer;
+}
 svg {
   background-color: #eee;
   margin-right: 1rem;
