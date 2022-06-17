@@ -4,13 +4,13 @@ import RangeInput from "./RangeInput";
 import React from "react";
 import Graph from "./Graph";
 import useLoop from "./useLoop";
+import useSmoothed from "./useSmoothed";
 
 export default ({ raw, name }: { raw: number; name: string }) => {
-  const [smoother, setSmoother] = useState(0.5);
-  const [smooth, setVMooth] = useState(0);
+  const { smoothed, smoother, setSmoother } = useSmoothed(raw);
   const [min, setMin] = useState(0);
   const [max, setMax] = useState(1);
-  const norm = (smooth - min) / (max - min);
+  const norm = (smoothed - min) / (max - min);
   const { audio, gain } = useLoop();
 
   const setMinSafe = (newMin: number) => {
@@ -23,7 +23,6 @@ export default ({ raw, name }: { raw: number; name: string }) => {
   };
 
   useEffect(() => {
-    setVMooth(smoother * smooth + (1 - smoother) * raw);
     if (gain) {
       gain.gain.value = Math.max(0, Math.min(1, norm));
     }
@@ -42,7 +41,7 @@ export default ({ raw, name }: { raw: number; name: string }) => {
       <Graph
         values={{
           "#00f": raw,
-          "#88f": smooth,
+          "#88f": smoothed,
           "#000": min,
           "#001": max,
         }}

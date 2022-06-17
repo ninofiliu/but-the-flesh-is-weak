@@ -4,6 +4,7 @@ import Graph from "./Graph";
 import useListen from "./useListen";
 import MinMax from "./MinMax";
 import Threshold from "./Threshold";
+import Diff from "./Diff";
 
 const Machine = ({
   maybePort,
@@ -27,7 +28,7 @@ const Machine = ({
               "#0c0": a2,
             }}
           />
-          <MinMax name="water" raw={a0} />
+          <Diff name="water" raw={a0} />
           <Threshold name="touch" raw={a1} threshold={0.75} />
           <MinMax name="flex" raw={a2} />
         </>
