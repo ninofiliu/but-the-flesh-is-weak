@@ -41,29 +41,29 @@ const useListen = (maybePort: SerialPort | null) => {
   return data;
 };
 
-const Water = ({ w }: { w: number }) => {
-  const smooth = 0.5;
-  const [wSmooth, setWSmooth] = useState(0);
-  const [wMin, setWMin] = useState(0);
-  const [wMax, setWMax] = useState(1);
-  const wNorm = (wSmooth - wMin) / (wMax - wMin);
+const MinMax = ({ raw, name }: { raw: number; name: string }) => {
+  const smoother = 0.5;
+  const [smooth, setVMooth] = useState(0);
+  const [min, setMin] = useState(0);
+  const [max, setMax] = useState(1);
+  const norm = (smooth - min) / (max - min);
   const [gain, setGain] = useState<GainNode | null>(null);
 
-  const setWMinSafe = (newWMin: number) => {
-    if (newWMin >= wMax) return;
-    setWMin(newWMin);
+  const setMinSafe = (newMin: number) => {
+    if (newMin >= max) return;
+    setMin(newMin);
   };
-  const setWMaxSafe = (newWMax: number) => {
-    if (newWMax <= wMin) return;
-    setWMax(newWMax);
+  const setMaxSafe = (newMax: number) => {
+    if (newMax <= min) return;
+    setMax(newMax);
   };
 
   useEffect(() => {
-    setWSmooth(smooth * wSmooth + (1 - smooth) * w);
+    setVMooth(smoother * smooth + (1 - smoother) * raw);
     if (gain) {
-      gain.gain.value = Math.max(0, Math.min(1, wNorm));
+      gain.gain.value = Math.max(0, Math.min(1, norm));
     }
-  }, [w]);
+  }, [raw]);
 
   useEffect(() => {
     setGain(createAudioGain(waterSrc));
@@ -71,29 +71,36 @@ const Water = ({ w }: { w: number }) => {
 
   return (
     <>
-      <h2>Water</h2>
-      <RangeInput value={wMin} setValue={setWMinSafe} name="water min" />
-      <RangeInput value={wMax} setValue={setWMaxSafe} name="water max" />
+      <h2>{name}</h2>
+      <RangeInput value={min} setValue={setMinSafe} name="min" />
+      <RangeInput value={max} setValue={setMaxSafe} name="max" />
       <Graph
         values={{
-          "#00f": w,
-          "#88f": wSmooth,
-          "#000": wMin,
-          "#001": wMax,
+          "#00f": raw,
+          "#88f": smooth,
+          "#000": min,
+          "#001": max,
         }}
       />
       <Graph
         values={{
-          "#44f": wNorm,
+          "#44f": norm,
         }}
       />
     </>
   );
 };
 
-const Touch = ({ t }: { t: number }) => {
-  const threshold = 0.75;
-  const [lastT, setLastT] = useState(threshold + 1);
+const Threshold = ({
+  raw,
+  name,
+  threshold,
+}: {
+  raw: number;
+  name: string;
+  threshold: number;
+}) => {
+  const [lastValue, setLastValue] = useState(threshold + 1);
   const [audioBuffer, setAudioBuffer] = useState<AudioBuffer | null>(null);
 
   useEffect(() => {
@@ -106,21 +113,22 @@ const Touch = ({ t }: { t: number }) => {
   }, []);
 
   useEffect(() => {
-    setLastT(t);
-    if (audioBuffer && lastT > threshold && t < threshold) {
+    setLastValue(raw);
+    if (audioBuffer && lastValue > threshold && raw < threshold) {
       const source = ac.createBufferSource();
       source.buffer = audioBuffer;
       source.connect(ac.destination);
       source.start();
       console.log("start");
     }
-  }, [t]);
+  }, [raw]);
+
   return (
     <>
-      <h2>Touch</h2>
+      <h2>{name}</h2>
       <Graph
         values={{
-          "#f00": t,
+          "#f00": raw,
           "#800": threshold,
         }}
       />
@@ -146,8 +154,8 @@ const Machine = ({
           "#f00": a1,
         }}
       />
-      <Water w={a0} />
-      <Touch t={a1} />
+      <MinMax name="water" raw={a0} />
+      <Threshold name="touch" raw={a1} threshold={0.75} />
     </>
   );
 };
