@@ -37,8 +37,8 @@ export default ({ raw, name }: { raw: number; name: string }) => {
         values={{
           "#00f": raw,
           "#88f": smoothed.current,
-          "#000": min,
-          "#001": max,
+          "#ffe": min,
+          "#fff": max,
         }}
       />
       <Graph
