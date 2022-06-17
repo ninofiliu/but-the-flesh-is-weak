@@ -16,12 +16,7 @@ const Machine = ({
 }) => {
   const [opened, setOpened] = useState(true);
   const { a0, a1, a2 } = useListen(maybePort);
-  const { gain } = useLoop(composition);
-
-  useEffect(() => {
-    if (!gain) return;
-    gain.gain.value = 10;
-  }, [gain]);
+  useLoop(composition);
 
   return (
     <div className="Machine">
