@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import ac from "./ac";
 
 export default () => {
+  const [src, setSrc] = useState("");
   const [gain, setGain] = useState<GainNode | null>(null);
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
 
@@ -17,5 +18,11 @@ export default () => {
     setGain(gain);
   }, []);
 
-  return { audio, gain };
+  useEffect(() => {
+    if (audio) {
+      audio.src = src;
+    }
+  }, [src]);
+
+  return { gain, src, setSrc };
 };

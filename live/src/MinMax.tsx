@@ -11,7 +11,7 @@ export default ({ raw, name }: { raw: number; name: string }) => {
   const [min, setMin] = useState(0);
   const [max, setMax] = useState(1);
   const norm = (smoothed - min) / (max - min);
-  const { audio, gain } = useLoop();
+  const { gain, src, setSrc } = useLoop();
 
   const setMinSafe = (newMin: number) => {
     if (newMin >= max) return;
@@ -31,10 +31,7 @@ export default ({ raw, name }: { raw: number; name: string }) => {
   return (
     <>
       <h2>{name}</h2>
-      <SrcPicker
-        value={audio?.src ?? ""}
-        onChange={(src) => (audio!.src = src)}
-      />
+      <SrcPicker value={src} onChange={setSrc} />
       <RangeInput value={smoother} setValue={setSmoother} name="smoother" />
       <RangeInput value={min} setValue={setMinSafe} name="min" />
       <RangeInput value={max} setValue={setMaxSafe} name="max" />
