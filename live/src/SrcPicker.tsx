@@ -23,6 +23,7 @@ export default ({
   onChange: (newValue: string) => any;
 }) => (
   <select value={value} onChange={(evt) => onChange(evt.target.value)}>
+    <option value="">none</option>
     {Object.entries(srcs).map(([key, value]) => (
       <option value={value} key={key}>
         {key}
