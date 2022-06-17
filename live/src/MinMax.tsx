@@ -10,8 +10,12 @@ export default ({ raw, name }: { raw: number; name: string }) => {
   const { smoothed, smoother, setSmoother } = useSmoothed(raw);
   const [min, setMin] = useState(0);
   const [max, setMax] = useState(1);
-  const norm = (smoothed.current - min) / (max - min);
+  const norm = (max - smoothed.current) / (max - min);
   const { gain, src, setSrc } = useLoop();
+
+  if (gain) {
+    gain.gain.value = Math.max(0, Math.min(1, norm));
+  }
 
   const setMinSafe = (newMin: number) => {
     if (newMin >= max) return;
@@ -21,12 +25,6 @@ export default ({ raw, name }: { raw: number; name: string }) => {
     if (newMax <= min) return;
     setMax(newMax);
   };
-
-  useEffect(() => {
-    if (gain) {
-      gain.gain.value = Math.max(0, Math.min(1, norm));
-    }
-  }, [raw]);
 
   return (
     <>

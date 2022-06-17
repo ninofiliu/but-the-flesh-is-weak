@@ -4,7 +4,8 @@ import Graph from "./Graph";
 import useListen from "./useListen";
 import MinMax from "./MinMax";
 import Threshold from "./Threshold";
-import Diff from "./Diff";
+import useLoop from "./useLoop";
+import composition from "./sounds/amo/composition.mp3";
 
 const Machine = ({
   maybePort,
@@ -15,6 +16,12 @@ const Machine = ({
 }) => {
   const [opened, setOpened] = useState(true);
   const { a0, a1, a2 } = useListen(maybePort);
+  const { gain } = useLoop(composition);
+
+  useEffect(() => {
+    if (!gain) return;
+    gain.gain.value = 10;
+  }, [gain]);
 
   return (
     <>
@@ -28,7 +35,7 @@ const Machine = ({
               green: a2,
             }}
           />
-          <Diff name="water" raw={a0} />
+          <MinMax name="water" raw={a0} />
           <Threshold name="touch" raw={a1} threshold={0.75} />
           <MinMax name="flex" raw={a2} />
         </>
