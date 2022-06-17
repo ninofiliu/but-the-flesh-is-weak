@@ -23,9 +23,9 @@ const Machine = ({
         <>
           <Graph
             values={{
-              "#00f": a0,
-              "#f00": a1,
-              "#0c0": a2,
+              blue: a0,
+              red: a1,
+              green: a2,
             }}
           />
           <Diff name="water" raw={a0} />

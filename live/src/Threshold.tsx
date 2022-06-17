@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import touch from "./sounds/amo/touch.mp3";
 import ac from "./ac";
 import Graph from "./Graph";
@@ -13,7 +13,6 @@ export default ({
   name: string;
   threshold: number;
 }) => {
-  const [lastValue, setLastValue] = useState(threshold + 1);
   const [audioBuffer, setAudioBuffer] = useState<AudioBuffer | null>(null);
   const [src, setSrc] = useState(touch);
 
@@ -26,16 +25,14 @@ export default ({
     })();
   }, [src]);
 
-  useEffect(() => {
-    setLastValue(raw);
-    if (audioBuffer && lastValue > threshold && raw < threshold) {
-      const source = ac.createBufferSource();
-      source.buffer = audioBuffer;
-      source.connect(ac.destination);
-      source.start();
-      console.log("start");
-    }
-  }, [raw]);
+  const lastValue = useRef(threshold + 1);
+  if (audioBuffer && lastValue.current > threshold && raw < threshold) {
+    const source = ac.createBufferSource();
+    source.buffer = audioBuffer;
+    source.connect(ac.destination);
+    source.start();
+  }
+  lastValue.current = raw;
 
   return (
     <>
