@@ -10,7 +10,7 @@ export default ({ raw, name }: { raw: number; name: string }) => {
   const { smoothed, smoother, setSmoother } = useSmoothed(raw);
   const [min, setMin] = useState(0);
   const [max, setMax] = useState(1);
-  const norm = (smoothed - min) / (max - min);
+  const norm = (smoothed.current - min) / (max - min);
   const { gain, src, setSrc } = useLoop();
 
   const setMinSafe = (newMin: number) => {
@@ -38,7 +38,7 @@ export default ({ raw, name }: { raw: number; name: string }) => {
       <Graph
         values={{
           "#00f": raw,
-          "#88f": smoothed,
+          "#88f": smoothed.current,
           "#000": min,
           "#001": max,
         }}

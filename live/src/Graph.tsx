@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 type Values = {
   [color: string]: number;
@@ -9,16 +9,12 @@ const width = 256;
 const height = 128;
 
 export default ({ values }: { values: Values }) => {
-  const [allValues, setAllValues] = useState<Values[]>(
-    Array(nbAllValues).fill({})
-  );
+  const allValues = useRef<Values[]>(Array(nbAllValues).fill({}));
   const [isHovering, setIsHovering] = useState(false);
   const [hoverX, setHoverX] = useState(0);
   const [hoverY, setHoverY] = useState(0);
 
-  useEffect(() => {
-    setAllValues([...allValues.slice(1), values]);
-  }, [values]);
+  allValues.current = [...allValues.current.slice(1), values];
 
   const onMouseMove: React.MouseEventHandler<SVGSVGElement> = (evt) => {
     setHoverX(evt.nativeEvent.offsetX);
@@ -38,7 +34,7 @@ export default ({ values }: { values: Values }) => {
         onMouseLeave={() => setIsHovering(false)}
         onMouseMove={onMouseMove}
       >
-        {allValues.flatMap((values, i) =>
+        {allValues.current.flatMap((values, i) =>
           Object.entries(values).map(([color, value]) => (
             <rect
               key={`${i}-${color}`}
@@ -60,7 +56,7 @@ export default ({ values }: { values: Values }) => {
       {isHovering && (
         <div>
           <div>{dataY(hoverY)}</div>
-          {Object.entries(allValues[dataI(hoverX)])
+          {Object.entries(allValues.current[dataI(hoverX)])
             .sort(([, valueA], [, valueB]) => valueB - valueA)
             .map(([color, value]) => (
               <div key={color} style={{ color }}>

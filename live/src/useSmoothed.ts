@@ -1,10 +1,8 @@
-import { useEffect, useState } from "react";
+import { useRef, useState } from "react";
 
 export default (raw: number) => {
   const [smoother, setSmoother] = useState(0.5);
-  const [smoothed, setSmoothed] = useState(0);
-  useEffect(() => {
-    setSmoothed(smoother * smoothed + (1 - smoother) * raw);
-  }, [raw]);
+  const smoothed = useRef(0);
+  smoothed.current = smoother * smoothed.current + (1 - smoother) * raw;
   return { smoothed, smoother, setSmoother };
 };
