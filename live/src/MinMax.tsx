@@ -2,17 +2,16 @@ import { useEffect, useState } from "react";
 import SrcPicker from "./SrcPicker";
 import RangeInput from "./RangeInput";
 import React from "react";
-import ac from "./ac";
 import Graph from "./Graph";
+import useLoop from "./useLoop";
 
 export default ({ raw, name }: { raw: number; name: string }) => {
-  const smoother = 0.5;
+  const [smoother, setSmoother] = useState(0.5);
   const [smooth, setVMooth] = useState(0);
   const [min, setMin] = useState(0);
   const [max, setMax] = useState(1);
   const norm = (smooth - min) / (max - min);
-  const [gain, setGain] = useState<GainNode | null>(null);
-  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
+  const { audio, gain } = useLoop();
 
   const setMinSafe = (newMin: number) => {
     if (newMin >= max) return;
@@ -30,26 +29,14 @@ export default ({ raw, name }: { raw: number; name: string }) => {
     }
   }, [raw]);
 
-  useEffect(() => {
-    const audio = document.createElement("audio");
-    audio.autoplay = true;
-    audio.loop = true;
-    const source = ac.createMediaElementSource(audio);
-    const gain = ac.createGain();
-    source.connect(gain);
-    gain.connect(ac.destination);
-    setAudio(audio);
-    setGain(gain);
-  }, []);
-
-  const updateSrc = (newSrc: string) => {
-    audio!.src = newSrc;
-  };
-
   return (
     <>
       <h2>{name}</h2>
-      <SrcPicker value={audio?.src ?? ""} onChange={updateSrc} />
+      <SrcPicker
+        value={audio?.src ?? ""}
+        onChange={(src) => (audio!.src = src)}
+      />
+      <RangeInput value={smoother} setValue={setSmoother} name="smoother" />
       <RangeInput value={min} setValue={setMinSafe} name="min" />
       <RangeInput value={max} setValue={setMaxSafe} name="max" />
       <Graph
